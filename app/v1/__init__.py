@@ -12,7 +12,7 @@ def ep_ping():
     return "pong", 200
 
 
-@v1.route('/create_letter', methods=['POST'])
+@v1.route('/letters', methods=['POST'])
 def ep_setup_create_letter():
     # Example of ORM usage (SQLAlchemy)
     letter = Letter()
