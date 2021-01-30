@@ -2,7 +2,7 @@ from flask import Blueprint, request, jsonify, make_response
 from flask_cors import CORS
 from flask import abort
 from app.models.letter import Letter, LetterSchema
-from app.getStatus import async_get_status
+from app.getStatus import async_update_status
 # from utils.Okapi import okapi_letter_status
 
 v1 = Blueprint("v1", __name__)
@@ -34,12 +34,19 @@ def ep_setup_create_letter():
 
 @v1.route('/letters', methods=['GET'])
 def index():
-    get_letters = Letter.query.all()
+    letters = Letter.query.all()
     letter_schema = LetterSchema(many = True) # many=True to be able to represent more than one instance when .load is called
-    letters = letter_schema.dump(get_letters)
+    letters = letter_schema.dump(letters)
     return make_response(jsonify({"letters": letters}))
 
-@v1.route('/letters/<tracking_number>/update')
+@v1.route('/letters/<tracking_number>/update', methods=['POST'])
 def ep_update_status(tracking_number):
-    async_get_status(tracking_number)
+    async_update_status(tracking_number)
+    return "Success"
+
+@v1.route('/letters/all/update', methods=['POST'])
+def ep_update_all_status():
+    letters = Letter.query.all()
+    for letter in letters:
+        async_update_status(letter.tracking_number)
     return "Success"
