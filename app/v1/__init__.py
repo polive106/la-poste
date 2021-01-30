@@ -1,7 +1,9 @@
-from flask import Blueprint, request
+from flask import Blueprint, request, jsonify, make_response
 from flask_cors import CORS
 from flask import abort
-from app.models.letter import Letter
+from app.models.letter import Letter, LetterSchema
+from app.getStatus import async_get_status
+# from utils.Okapi import okapi_letter_status
 
 v1 = Blueprint("v1", __name__)
 CORS(v1)
@@ -28,3 +30,16 @@ def ep_setup_create_letter():
         return f"All done : letter object {letter.id} has been created", 200
     else:
         abort(400, 'Please specify at least a tracking number')
+
+
+@v1.route('/letters', methods=['GET'])
+def index():
+    get_letters = Letter.query.all()
+    letter_schema = LetterSchema(many = True) # many=True to be able to represent more than one instance when .load is called
+    letters = letter_schema.dump(get_letters)
+    return make_response(jsonify({"letters": letters}))
+
+@v1.route('/letters/<tracking_number>/update')
+def ep_update_status(tracking_number):
+    async_get_status(tracking_number)
+    return "Success"

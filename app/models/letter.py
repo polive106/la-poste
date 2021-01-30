@@ -1,6 +1,8 @@
 from app import db
 from marshmallow_sqlalchemy import ModelSchema
 from marshmallow import fields
+from flask_sqlalchemy import SQLAlchemy
+
 class Letter(db.Model):
 
     id = db.Column(db.Integer, primary_key = True)
