@@ -18,19 +18,21 @@ def create_app(config_name):
     app.config.from_object(config[config_name])
     celery.conf.update(app.config)
     db.init_app(app)
-    # db = SQLAlchemy(app)
-    with app.app_context():
+
+    with app.app_context(): # app_context needed to import blueprints / letters => mostly for celery
         from .models.letter import Letter
         from .v1 import v1 as v1_blueprint
         app.register_blueprint(v1_blueprint, url_prefix="/v1")
 
+
+    # CLI cmd to create DB
     @click.command(name="db_create")
     @with_appcontext
     def create():
         db.create_all()
         print('Database created!')
 
-
+    # CLI cmd to seed DB with sandbox env examples from OKAPI
     @click.command(name="db_seed")
     @with_appcontext
     def seed():
@@ -43,12 +45,14 @@ def create_app(config_name):
             letter.add()
         print('Database seeded')
 
+    # CLI cmd to drop DB
     @click.command(name="db_drop")
     @with_appcontext
     def drop():
         db.drop_all()
         print('Database dropped')
 
+    # Create CLI cmd after definition
     app.cli.add_command(create)
     app.cli.add_command(seed)
     app.cli.add_command(drop)
