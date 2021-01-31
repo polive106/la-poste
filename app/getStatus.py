@@ -1,6 +1,7 @@
 from . import celery
 import redis
 import os
+from dotenv import load_dotenv
 from app.config import config, Config
 from app.models.letter import Letter
 from urllib.parse import urlparse
@@ -20,12 +21,11 @@ except redis.ConnectionError:
 
 
 
-
 @celery.task()
 def update_status(tracking_number):
     # defining the api-endpoint
+    load_dotenv()
     API_ENDPOINT = f'https://api.laposte.fr/suivi/v2/idships/{tracking_number}?lang=fr_FR'
-    # data to be sent to api
     API_KEY = os.getenv('API_KEY')
     letter = Letter.query.filter_by(tracking_number=tracking_number).first()
     if letter is None:
@@ -34,10 +34,13 @@ def update_status(tracking_number):
             f"Letter not found for Tracking number: {tracking_number}",
         )
     else:
+
         headers = {'X-Okapi-Key': API_KEY, 'Accept':'application/json', 'Content-Type': 'application/json'}
+
         # sending get request and saving response as response object
         r = requests.get(url = API_ENDPOINT, headers = headers)
         print(f"Getting status for {tracking_number}")
+        print(r.text)
         # get data as json
         try:
             json_data = json.loads(r.text)
