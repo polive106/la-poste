@@ -38,7 +38,7 @@ def create_app(config_name):
     def seed():
         from .models.letter import Letter
         print(Letter)
-        tracking_numbers = ["1A00915820380", "4P36275770836", "1K36275770836", "4G11111111110", "RK633119313NZ", "3P11111111110", "8R11111111110", "115111111111111", "5S11111111110", "3SAAAA1111111", "6P01007508742", "6T11111111110"]
+        tracking_numbers = ["1A00915820380", "4P36275770836", "1K36275770836", "4G11111111110", "RK633119313NZ", "3P11111111110", "8R11111111110", "115111111111111", "5S11111111110", "3SAAAA1111111", "6P01007508742", "6T11111111110", "6W111111111XX", "FD633119313NZ", "GF111111110NZ", "114111111111111", "GM111111110NZ", "ZZ111111110NZ", "FA633119313XX", "6C12345678910", "6C22345678999"]
         for tracking_number in tracking_numbers:
             print(tracking_number)
             letter = Letter(tracking_number=tracking_number)
