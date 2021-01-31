@@ -8,10 +8,6 @@ from app.getStatus import async_update_status
 v1 = Blueprint("v1", __name__)
 CORS(v1)
 
-
-
-
-
 @v1.route('/ping', methods=['GET'])
 def ep_ping():
     return "pong", 200
@@ -41,12 +37,16 @@ def index():
 
 @v1.route('/letters/<tracking_number>/update', methods=['POST'])
 def ep_update_status(tracking_number):
-    async_update_status(tracking_number)
-    return "Success"
+    letter = Letter.query.filter_by(tracking_number=tracking_number).first()
+    if letter is None:
+        abort(404, f"Letter not found for Tracking number: {tracking_number}")
+    else:
+        async_update_status(tracking_number)
+    return {"message": f"Update task run accepted for letter with tracking_number {tracking_number}"}, 202
 
 @v1.route('/letters/all/update', methods=['POST'])
 def ep_update_all_status():
     letters = Letter.query.all()
     for letter in letters:
         async_update_status(letter.tracking_number)
-    return "Success"
+    return {"message": "Status update launched for all letters"}, 202

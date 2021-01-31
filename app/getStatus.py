@@ -27,32 +27,27 @@ def update_status(tracking_number):
     load_dotenv()
     API_ENDPOINT = f'https://api.laposte.fr/suivi/v2/idships/{tracking_number}?lang=fr_FR'
     API_KEY = os.getenv('API_KEY')
-    letter = Letter.query.filter_by(tracking_number=tracking_number).first()
-    if letter is None:
-        abort(
-            404,
-            f"Letter not found for Tracking number: {tracking_number}",
-        )
-    else:
+    headers = {'X-Okapi-Key': API_KEY, 'Accept':'application/json', 'Content-Type': 'application/json'}
 
-        headers = {'X-Okapi-Key': API_KEY, 'Accept':'application/json', 'Content-Type': 'application/json'}
-
-        # sending get request and saving response as response object
-        r = requests.get(url = API_ENDPOINT, headers = headers)
-        print(f"Getting status for {tracking_number}")
-        print(r.text)
-        # get data as json
-        try:
-            json_data = json.loads(r.text)
-            new_status = json_data['shipment']['timeline'][-1]['shortLabel']
-            letter.status = new_status
-            letter.add()
-        except:
-            new_status = "Statut indisponible"
-            letter.status = new_status
-            letter.add()
+    # sending get request and saving response as response object
+    r = requests.get(url = API_ENDPOINT, headers = headers)
+    print(f"Getting status for {tracking_number}")
+    print(r.text)
+    # get data as json
+    try:
+        json_data = json.loads(r.text)
+        new_status = json_data['shipment']['timeline'][-1]['shortLabel']
+        letter.status = new_status
+        letter.add()
+    except:
+        new_status = "Statut indisponible"
+        letter.status = new_status
+        letter.add()
 
 def async_update_status(tracking_number):
     update_status.delay(tracking_number)
     return
+
+
+
 

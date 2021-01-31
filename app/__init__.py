@@ -23,14 +23,15 @@ def create_app(config_name):
         from .models.letter import Letter
         from .v1 import v1 as v1_blueprint
         app.register_blueprint(v1_blueprint, url_prefix="/v1")
-    @click.command(name="create")
+
+    @click.command(name="db_create")
     @with_appcontext
     def create():
         db.create_all()
         print('Database created!')
 
 
-    @click.command(name="seed")
+    @click.command(name="db_seed")
     @with_appcontext
     def seed():
         from .models.letter import Letter
@@ -42,7 +43,7 @@ def create_app(config_name):
             letter.add()
         print('Database seeded')
 
-    @click.command(name="drop")
+    @click.command(name="db_drop")
     @with_appcontext
     def drop():
         db.drop_all()
